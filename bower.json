@@ -1,0 +1,25 @@
+{
+  "name": "tuio",
+  "homepage": "https://github.com/s-light/tuio.js",
+  "authors": [
+    "s-light <github@s-light.eu>"
+  ],
+  "description": "small wrapper to convert TUIO WebSocket to nice Events",
+  "main": "/dist/tuio.js",
+  "keywords": [
+    "TUIO",
+    "WebSocket",
+    "OSC",
+    "Pointer",
+    "Event",
+    "Fiducials"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

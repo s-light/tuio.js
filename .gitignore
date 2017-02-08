@@ -1,3 +1,10 @@
+
+# bower related things
+bower_components
+.config
+.npmrc
+.vagrant
+
 # Logs
 logs
 *.log

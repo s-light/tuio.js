@@ -24,6 +24,10 @@
     ".jshintrc"
   ],
   "dependencies": {
-    "osc.js": "^2.2.0"
+    "osc.js": "^2.2.0",
+    "eventEmitter": "^5.1.0"
+  },
+  "resolutions": {
+    "eventEmitter": "5.0.0"
   }
 }

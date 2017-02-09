@@ -71,7 +71,7 @@ var tuio = tuio || {};
             profile: null,
             source: null,
             alive: [],
-            sets: {},
+            sets: new Map(),
             fseq: null
         };
     };
@@ -140,6 +140,7 @@ var tuio = tuio || {};
         const address = oscMessage.address;
         // check for tuio message
         if (address.startsWith("/tuio/")) {
+        // if (false) {
             // its a tuio message.
             const tuioMessage = oscMessage.args;
 
@@ -148,14 +149,14 @@ var tuio = tuio || {};
                 address.indexOf('/tuio/') + '/tuio/'.length
             );
 
-            // initially set profile
+            // if inputBuffer is clean set profile
             if (this.inputBuffer.profile === null) {
                 this.inputBuffer.profile = profile;
             }
 
             // check if profile is correct
             // (that means we are still in the same bundle)
-            if (this.inputBuffer.profile == profile ) {
+            if (this.inputBuffer.profile == profile) {
                 // get message type
                 const [messageType, ...messageParams] = tuioMessage;
                 // console.log("messageType", messageType, "messageParams", messageParams);
@@ -169,13 +170,14 @@ var tuio = tuio || {};
                     } break;
                     case 'set': {
                         const [sessionID, ...values] = messageParams;
-                        this.inputBuffer.sets[sessionID] = values;
+                        this.inputBuffer.sets.set(sessionID, values);
                     } break;
                     case 'fseq': {
                         this.inputBuffer.fseq = messageParams[0];
 
                         // full bundle received
                         this.inputBufferLast = this.inputBuffer;
+
                         // please process it!
                         this.processBundle(this.inputBufferLast);
 
@@ -192,6 +194,18 @@ var tuio = tuio || {};
                 console.log("received message bundle corrupt!!", this.inputBuffer);
                 // clean inputBuffer
                 this.inputBuffer = this.createInputBuffer();
+                // console.log(
+                //     "?? ",
+                //     "this.inputBuffer.profile", this.inputBuffer.profile,
+                //     "profile", profile,
+                //     "this.inputBuffer.profile == profile", this.inputBuffer.profile == profile
+                // );
+                // console.log(
+                //     "?? ",
+                //     "address", address,
+                //     "tuioMessage", tuioMessage,
+                //     "inputBuffer",  this.inputBuffer
+                // );
             }
 
         } // end check for tuio message
@@ -199,12 +213,14 @@ var tuio = tuio || {};
     };
 
     tuio.aTest.prototype.processBundle = function (bundle) {
-        console.log("bundle", bundle);
+        // console.log("bundle", bundle);
         const profile = bundle.profile;
         // find profile and object type
         // check for custom profile
         if (!profile.startsWith("_")) {
             // we have a normal profile
+            // console.log("profile", profile);
+
             // // split profile in dimmension and type
             // const re = /(\d+D)(\D{3})/i;
             // // console.log("address.match(re)", address.match(re));
@@ -226,9 +242,12 @@ var tuio = tuio || {};
             //     default:
             //         console.log(`profile ${profile} not in TUIO 1.1 spec. For Custom Profiles use _[formatString]`);
             // }
+
             if (profile in this.tuioProfiles) {
                 const profileTuioObjects = this.tuioProfiles[profile];
                 // profileTuioObjects holds a Map with key==sessionID and value==object values
+                // console.log("profileTuioObjects", profileTuioObjects);
+                // console.log("bundle.alive", bundle.alive);
 
                 // now we can check if we have 'new', 'known', 'removed' sessionIDs.
                 // if new sessionID add it
@@ -237,11 +256,14 @@ var tuio = tuio || {};
 
                 // find new ones
                 let newSessionIDs = [];
-                for (const [sessionID] of bundle.alive) {
-                    if (!profileTuioObjects.keys().includes(sessionID)) {
+                for (const sessionID of bundle.alive) {
+                    if (profileTuioObjects.get(sessionID) === undefined) {
                         newSessionIDs.push(sessionID);
                         profileTuioObjects.set(sessionID, null);
                     }
+                }
+                if (newSessionIDs.length > 0) {
+                    console.log("newSessionIDs", newSessionIDs);
                 }
 
                 // find removed ones
@@ -249,10 +271,24 @@ var tuio = tuio || {};
                 for (const [sessionID] of profileTuioObjects) {
                     if (!bundle.alive.includes(sessionID)) {
                         removedSessionIDs.push(sessionID);
-                        // profileTuioObjects.delete(sessionID);
+                        profileTuioObjects.delete(sessionID);
                         // deletetion should be done if all things are handled..
                     }
                 }
+                if (removedSessionIDs.length > 0) {
+                    console.log("removedSessionIDs", removedSessionIDs);
+                }
+
+                // set new values
+                for (const [sessionID, values] of bundle.sets) {
+                    // console.log("sessionID", sessionID, "values", values);
+                    // if (profileTuioObjects.get(sessionID)) {
+                        profileTuioObjects.set(sessionID, values);
+                    // }
+                }
+
+                // now we have a updated set and all information to generate the events.
+                // ....
 
             } else {
                 console.log(`profile ${profile} not in TUIO 1.1 spec. For Custom Profiles use _[formatString]`);

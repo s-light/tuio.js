@@ -20,7 +20,8 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    ".jshintrc"
   ],
   "dependencies": {
     "osc.js": "^2.2.0"

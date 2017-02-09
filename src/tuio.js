@@ -57,27 +57,29 @@
 
 class TUIOProfile {
     constructor({profileName, parserCallback}) {
-        this._profileName = profileName;
-        this._parserCallback = parserCallback;
+        // this._profileName = profileName;
+        // this._parserCallback = parserCallback;
+        this.profileName = profileName;
+        this.parserCallback = parserCallback;
 
         this.sessionIDs = new Map();
     }
 
     // 15.2.2.3 Getters and setters
     // http://exploringjs.com/es6/ch_classes.html#_inside-the-body-of-a-class-definition
-    get parserCallback() {
-        return this._parserCallback;
-    }
-    set parserCallback(value) {
-        this._parserCallback = value;
-    }
-
-    get profileName() {
-        return this._profileName;
-    }
-    set profileName(value) {
-        this._profileName = value;
-    }
+    // get parserCallback() {
+    //     return this._parserCallback;
+    // }
+    // set parserCallback(value) {
+    //     this._parserCallback = value;
+    // }
+    //
+    // get profileName() {
+    //     return this._profileName;
+    // }
+    // set profileName(value) {
+    //     this._profileName = value;
+    // }
 
 }
 
@@ -108,9 +110,9 @@ class TUIOReceiver extends EventEmitter {
         this.inputBuffer = this.createInputBuffer();
 
         this.eventTypes = [
-            'add',
-            'set',
-            'removed',
+            'Add',
+            'Set',
+            'Del',
         ];
 
         this.tuioProfiles = new Map();
@@ -157,7 +159,7 @@ class TUIOReceiver extends EventEmitter {
                 let profileEvents = [];
                 for (const eventType of this.eventTypes) {
                     // generate event names
-                    profileEvents.push(profileName + eventType);
+                    profileEvents.push("tuio" + profileName + eventType);
                 }
                 // predefine Events so that you can use regex listeners
                 // https://github.com/Olical/EventEmitter/blob/master/docs/guide.md#using-regular-expressions
@@ -286,86 +288,150 @@ class TUIOReceiver extends EventEmitter {
     processBundle(bundle) {
         // console.log("bundle", bundle);
         const profile = bundle.profile;
-        // find profile and object type
-        // check for custom profile
-        if (!profile.startsWith("_")) {
-            // we have a normal profile
-            // console.log("profile", profile);
+        // console.log("profile", profile);
 
-            // // split profile in dimmension and type
-            // const re = /(\d+D)(\D{3})/i;
-            // // console.log("address.match(re)", address.match(re));
-            // // http://exploringjs.com/es6/ch_destructuring.html#_destructuring-returned-arrays
-            // const [, profileDimensions, objectType] = profile.match(re) || [];
+        // // check for custom profile
+        // if (!profile.startsWith("_")) {
+        //     // find profile and object type
+        //     // split profile in dimmension and type
+        //     const re = /(\d+D)(\D{3})/i;
+        //     // console.log("address.match(re)", address.match(re));
+        //     // http://exploringjs.com/es6/ch_destructuring.html#_destructuring-returned-arrays
+        //     const [, profileDimensions, objectType] = profile.match(re) || [];
+        // }
 
-            const tuioProfile = this.tuioProfiles.get(profile);
-            if (tuioProfile) {
-                // tuioProfile holds a Map with key==sessionID and value==object values
-                // console.log("tuioProfile", tuioProfile);
-                // console.log("bundle.alive", bundle.alive);
+        const tuioProfile = this.tuioProfiles.get(profile);
+        if (tuioProfile) {
+            // tuioProfile holds a Map with key==sessionID and value==object values
+            // console.log("tuioProfile", tuioProfile);
+            // console.log("bundle.alive", bundle.alive);
 
-                // now we can check if we have 'new', 'known', 'removed' sessionIDs.
-                // if new sessionID add it
-                // if known sessionID update information
-                // if removed sessionID delete from list
+            // now we can check if we have 'new', 'known', 'removed' sessionIDs.
+            // if new sessionID add it
+            // if known sessionID update information
+            // if removed sessionID delete from list
 
-                // find new ones
-                let newSessionIDs = [];
-                for (const sessionID of bundle.alive) {
-                    if (tuioProfile.sessionIDs.get(sessionID) === undefined) {
-                        newSessionIDs.push(sessionID);
-                        tuioProfile.sessionIDs.set(sessionID, null);
-                    }
+            // find new ones
+            let newSessionIDs = [];
+            for (const sessionID of bundle.alive) {
+                if (tuioProfile.sessionIDs.get(sessionID) === undefined) {
+                    newSessionIDs.push(sessionID);
+                    tuioProfile.sessionIDs.set(sessionID, null);
                 }
-                if (newSessionIDs.length > 0) {
-                    console.log("newSessionIDs", newSessionIDs);
-                }
-
-                // find removed ones
-                let removedSessionIDs = [];
-                for (const [sessionID] of tuioProfile.sessionIDs) {
-                    if (!bundle.alive.includes(sessionID)) {
-                        removedSessionIDs.push(sessionID);
-                        tuioProfile.sessionIDs.delete(sessionID);
-                        // deletetion should be done if all things are handled..
-                    }
-                }
-                if (removedSessionIDs.length > 0) {
-                    console.log("removedSessionIDs", removedSessionIDs);
-                }
-
-                // set new values
-                for (const [sessionID, values] of bundle.sets) {
-                    // console.log("sessionID", sessionID, "values", values);
-                    // if (tuioProfile.get(sessionID)) {
-                        // if we have no parserCallback we fallback to the original array.
-                        let parsedValues = values;
-                        if (tuioProfile.parserCallback) {
-                            parsedValues = tuioProfile.parserCallback(
-                                tuioProfile.profileName,
-                                values
-                            );
-                            // console.log("parsedValues", parsedValues);
-                        }
-                        tuioProfile.sessionIDs.set(sessionID, parsedValues);
-                    // }
-                }
-
-                // now we have a updated set and all information to generate the events.
-                // ....
-
-            } else {
-                console.log(
-                    `profile ${profile} not found.` +
-                    `For Custom Profiles use _[formatString] ` +
-                    `and be sure to give a working parserCallback.`
-                );
             }
+            // if (newSessionIDs.length > 0) {
+            //     console.log("newSessionIDs", newSessionIDs);
+            // }
+
+            // find removed ones
+            let delSessionIDs = [];
+            for (const [sessionID] of tuioProfile.sessionIDs) {
+                if (!bundle.alive.includes(sessionID)) {
+                    delSessionIDs.push(sessionID);
+                    // tuioProfile.sessionIDs.delete(sessionID);
+                    // actual deletetion is done after sending the event.
+                }
+            }
+            // if (delSessionIDs.length > 0) {
+            //     console.log("delSessionIDs", delSessionIDs);
+            // }
+
+            // set new values
+            let setSessionIDs = [];
+            for (const [sessionID, values] of bundle.sets) {
+                // console.log("sessionID", sessionID, "values", values);
+                // if (tuioProfile.get(sessionID)) {
+                    // if we have no parserCallback we fallback to the original array.
+                    let parsedValues = values;
+                    if (tuioProfile.parserCallback) {
+                        parsedValues = tuioProfile.parserCallback(
+                            tuioProfile.profileName,
+                            values
+                        );
+                        // console.log("parsedValues", parsedValues);
+                    }
+                    tuioProfile.sessionIDs.set(sessionID, parsedValues);
+                    setSessionIDs.push(sessionID);
+                // }
+            }
+            // if (setSessionIDs.length > 0) {
+            //     console.log("setSessionIDs", setSessionIDs);
+            // }
+
+
+            // now we have a updated all things and can generate the events.
+
+            // emit all 'Add' events
+            for (const sessionID of newSessionIDs) {
+                const values = tuioProfile.sessionIDs.get(sessionID);
+                this.emitTuioEvent({
+                    source: bundle.source,
+                    eventType: 'Add',
+                    profileName: tuioProfile.profileName,
+                    sessionID: sessionID,
+                    values: values
+                });
+            }
+
+            // emit all 'Set' events
+            for (const sessionID of setSessionIDs) {
+                const values = tuioProfile.sessionIDs.get(sessionID);
+                this.emitTuioEvent({
+                    source: bundle.source,
+                    eventType: 'Set',
+                    profileName: tuioProfile.profileName,
+                    sessionID: sessionID,
+                    values: values
+                });
+            }
+
+            // emit all 'Del' events
+            for (const sessionID of delSessionIDs) {
+                const values = tuioProfile.sessionIDs.get(sessionID);
+                this.emitTuioEvent({
+                    source: bundle.source,
+                    eventType: 'Del',
+                    profileName: tuioProfile.profileName,
+                    sessionID: sessionID,
+                    values: values
+                });
+                // now we can safely delete the entry.
+                tuioProfile.sessionIDs.delete(sessionID);
+            }
+
+            // console.log(
+            //     "event handling done. ",
+            //     "tuioProfile.sessionIDs", tuioProfile.sessionIDs
+            // );
+
         } else {
-            // handle custom profiles
-            const profileString = profile.slice(profile.indexOf('_'));
-            this.handleProfileCustom(profileString, bundle);
+            console.log(
+                `profile ${profile} not found.` +
+                `For Custom Profiles use _[formatString] ` +
+                `and be sure to give a working parserCallback.`
+            );
         }
+    }
+
+    emitTuioEvent({
+        source,
+        eventType,
+        profileName,
+        sessionID,
+        values
+    }) {
+        const eventName = "tuio" + profileName + eventType;
+        let eventObject = {
+            origin: this,
+            source: source,
+            eventType: eventType,
+            profileName: profileName,
+            sessionID: sessionID,
+            values: values
+        };
+        // https://github.com/Olical/EventEmitter/blob/master/docs/api.md#emit
+        this.emit(eventName, eventObject);
+        // console.log("eventName", eventName, "eventObject", eventObject);
     }
 
     // ******************************************

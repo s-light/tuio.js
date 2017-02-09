@@ -1,25 +1,51 @@
-
-// would this work?!?!
-// import osc from 'bower_components/osc.js/dist/osc-browser.js';
-
-// export class TUIO {
+// TUIO Protocoll support for javascript
+// tries to interpret incomming osc messages as tuio messages.
+// http://www.tuio.org/?specification
 //
-// }
-
 // requires a loaded osc.js
 // https://github.com/colinbdclark/osc.js
-
-// heavily modeld after
+//
+// inspired by
 // https://github.com/colinbdclark/osc.js-examples/blob/master/browser/web/socket-synth.js
+//
+// MIT License
+// written by Stefan Krüger (github@s-light.eu)
+//
 
-// tryes to interpret incomming osc messages as tuio messages.
-// http://www.tuio.org/?specification
+// http://exploringjs.com/es6/ch_modules.html#_named-exports-several-per-module
+// currently not supported by browsers?!
+// import osc from '../bower_components/osc.js/dist/osc-browser.js';
+// export class TUIOReceiver {
 
-var tuio = tuio || {};
 
-(function () {
+//     tuio.aTest.prototype.handleProfile2D = function (objecttype, tuioMessage) {
+//         // obj: set s i x y a X Y A m r
+//         // cur: set s x y X Y m
+//         // blb: set s x y a w h f X Y A m r
+//         // TODO
+//     };
+//
+//     tuio.aTest.prototype.handleProfile25D = function (objecttype, tuioMessage) {
+//         // obj: set s i x y z a X Y Z A m r
+//         // cur: set s x y z X Y Z m
+//         // blb: set s x y z a w h f X Y Z A m r
+//         // TODO
+//     };
+//
+//     tuio.aTest.prototype.handleProfile3D = function (objecttype, tuioMessage) {
+//         // obj: set s i x y z a b c X Y Z A B C m r
+//         // cur: set s x y z X Y Z m
+//         // blb: set s x y z a b c w h d v X Y Z A B C m r
+//         // TODO
+//     };
+//
 
-    tuio.aTest = function () {
+
+
+class TUIOReceiver {
+    constructor(prop) {
+        this.prop = prop;
+
         this.oscPort = new osc.WebSocketPort({
             url: "ws://localhost:3334"
         });
@@ -49,9 +75,18 @@ var tuio = tuio || {};
             '3Dcur': new Map(),
             '3Dblb': new Map(),
         };
-    };
+    }
 
-    tuio.aTest.prototype.listen = function () {
+    static staticMethod() {
+        return 'classy';
+    }
+
+    prototypeMethod() {
+        return 'prototypical';
+    }
+
+
+    listen() {
         // this.oscPort.on("open", this.play.bind(this));
         // this.oscPort.on("open", function (msg) {
         //     console.log("open", msg);
@@ -64,20 +99,9 @@ var tuio = tuio || {};
         //     console.log("close", msg);
         // });
         // this.oscPort.on("close", this.pause.bind(this));
-    };
+    }
 
-    tuio.aTest.prototype.createInputBuffer = function () {
-        return {
-            profile: null,
-            source: null,
-            alive: [],
-            sets: new Map(),
-            fseq: null
-        };
-    };
-
-    tuio.aTest.prototype.handleMessage = function (oscMessage) {
-
+    handleMessage(oscMessage) {
         /*
             2D Interactive Surface
 
@@ -209,10 +233,9 @@ var tuio = tuio || {};
             }
 
         } // end check for tuio message
+    }
 
-    };
-
-    tuio.aTest.prototype.processBundle = function (bundle) {
+    processBundle(bundle) {
         // console.log("bundle", bundle);
         const profile = bundle.profile;
         // find profile and object type
@@ -298,35 +321,25 @@ var tuio = tuio || {};
             const profileString = profile.slice(profile.indexOf('_'));
             this.handleProfileCustom(profileString, bundle);
         }
-    };
+    }
 
+    // ******************************************
+    // Internal Helper
 
+    createInputBuffer() {
+        return {
+            profile: null,
+            source: null,
+            alive: [],
+            sets: new Map(),
+            fseq: null
+        };
+    }
 
-    tuio.aTest.prototype.handleProfile2D = function (objecttype, tuioMessage) {
-        // obj: set s i x y a X Y A m r
-        // cur: set s x y X Y m
-        // blb: set s x y a w h f X Y A m r
-        // TODO
-    };
-
-    tuio.aTest.prototype.handleProfile25D = function (objecttype, tuioMessage) {
-        // obj: set s i x y z a X Y Z A m r
-        // cur: set s x y z X Y Z m
-        // blb: set s x y z a w h f X Y Z A m r
-        // TODO
-    };
-
-    tuio.aTest.prototype.handleProfile3D = function (objecttype, tuioMessage) {
-        // obj: set s i x y z a b c X Y Z A B C m r
-        // cur: set s x y z X Y Z m
-        // blb: set s x y z a b c w h d v X Y Z A B C m r
-        // TODO
-    };
-
-    tuio.aTest.prototype.handleProfileCustom = function (profileString, bundle) {
+    handleProfileCustom(profileString, bundle) {
         // TODO
         console.log("handleProfileCustom", profileString, "!!! NOT IMPLEMENTED !!!");
-    };
+    }
 
 
-}());
+}

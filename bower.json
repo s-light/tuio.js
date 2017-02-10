@@ -5,7 +5,7 @@
     "s-light <github@s-light.eu>"
   ],
   "description": "small wrapper to convert TUIO WebSocket to nice Events",
-  "main": "/dist/tuio.js",
+  "main": "src/tuio.js",
   "keywords": [
     "TUIO",
     "WebSocket",

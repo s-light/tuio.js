@@ -15,45 +15,105 @@
 // written by Stefan Krüger (github@s-light.eu)
 //
 
+// TUIO Event Names
+//
+// defined as:
+// 'tuio' + profileName + eventType
+//
+// Possible default Event Names
+// tuio2DcurAdd
+// tuio2DcurSet
+// tuio2DcurDel
+// tuio2DobjAdd
+// tuio2DobjSet
+// tuio2DobjDel
+// tuio2DblbAdd
+// tuio2DblbSet
+// tuio2DblbDel
+//
+// tuio25DcurAdd
+// tuio25DcurSet
+// tuio25DcurDel
+// tuio25DobjAdd
+// tuio25DobjSet
+// tuio25DobjDel
+// tuio25DblbAdd
+// tuio25DblbSet
+// tuio25DblbDel
+//
+// tuio3DcurAdd
+// tuio3DcurSet
+// tuio3DcurDel
+// tuio3DobjAdd
+// tuio3DobjSet
+// tuio3DobjDel
+// tuio3DblbAdd
+// tuio3DblbSet
+// tuio3DblbDel
+//
+//
+// RegEx for event names:
+// /tuio(?:2|25|3)D(?:cur|obj|blb)(?:Add|Set|Del)/
+//
+// Tests for Not Matching Regex
+// tuio3DxxxAdd
+// tuio3DcurPet
+// tuio1DcurDel
 
-/*
-    http://www.tuio.org/?specification
 
-    2D Interactive Surface
+// http://www.tuio.org/?specification
+//
+// 2D Interactive Surface
+//
+//     /tuio/2Dobj set s i x y a X Y A m r
+//     /tuio/2Dcur set s x y X Y m
+//     /tuio/2Dblb set s x y a w h f X Y A m r
+//
+// 2.5D Interactive Surface
+//
+//     /tuio/25Dobj set s i x y z a X Y Z A m r
+//     /tuio/25Dcur set s x y z X Y Z m
+//     /tuio/25Dblb set s x y z a w h f X Y Z A m r
+//
+// 3D Interactive Surface
+//
+//     /tuio/3Dobj set s i x y z a b c X Y Z A B C m r
+//     /tuio/3Dcur set s x y z X Y Z m
+//     /tuio/3Dblb set s x y z a b c w h d v X Y Z A B C m r
+//
+// custom profile
+//
+//     /tuio/_[formatString]
+//
+//
+//  alligned overview
+//      2D obj:  i x y   a             X Y   A     m r
+//      2D cur:    x y                 X Y         m
+//      2D blb:    x y   a     w h   f X Y   A     m r
+//     25D obj:  i x y z a             X Y Z A     m r
+//     25D cur:    x y z               X Y Z       m
+//     25D blb:    x y z a     w h   f X Y Z A     m r
+//      3D obj:  i x y z a b c         X Y Z A B C m r
+//      3D cur:    x y z               X Y Z       m
+//      3D blb:    x y z a b c w h d v X Y Z A B C m r
+//
+// semantic types of set messages
+//     s          Session ID (temporary object ID)                         int32
+//     i          Class ID (e.g. marker ID)                                int32
+//     x, y, z    Position                                                 float32, range 0...1
+//     a, b, c    Angle                                                    float32, range 0..2PI
+//     w, h, d    Dimension                                                float32, range 0..1
+//     f, v       Area, Volume                                             float32, range 0..1
+//     X, Y ,Z    Velocity vector (motion speed & direction)               float32
+//     A, B, C    Rotation velocity vector (rotation speed & direction)    float32
+//     m          Motion acceleration                                      float32
+//     r          Rotation acceleration                                    float32
+//     P          Free parameter                                           type defined by OSC message header
+//
 
-        /tuio/2Dobj set s i x y a X Y A m r
-        /tuio/2Dcur set s x y X Y m
-        /tuio/2Dblb set s x y a w h f X Y A m r
 
-    2.5D Interactive Surface
+TUIOEventRegEx = /tuio(?:2|25|3)D(?:cur|obj|blb)(?:Add|Set|Del)/;
 
-        /tuio/25Dobj set s i x y z a X Y Z A m r
-        /tuio/25Dcur set s x y z X Y Z m
-        /tuio/25Dblb set s x y z a w h f X Y Z A m r
-
-    3D Interactive Surface
-
-        /tuio/3Dobj set s i x y z a b c X Y Z A B C m r
-        /tuio/3Dcur set s x y z X Y Z m
-        /tuio/3Dblb set s x y z a b c w h d v X Y Z A B C m r
-
-    custom profile
-
-        /tuio/_[formatString]
-
-    semantic types of set messages
-        s          Session ID (temporary object ID)                         int32
-        i          Class ID (e.g. marker ID)                                int32
-        x, y, z    Position                                                 float32, range 0...1
-        a, b, c    Angle                                                    float32, range 0..2PI
-        w, h, d    Dimension                                                float32, range 0..1
-        f, v       Area, Volume                                             float32, range 0..1
-        X, Y ,Z    Velocity vector (motion speed & direction)               float32
-        A, B, C    Rotation velocity vector (rotation speed & direction)    float32
-        m          Motion acceleration                                      float32
-        r          Rotation acceleration                                    float32
-        P          Free parameter                                           type defined by OSC message header
-*/
 
 class TUIOProfile {
     constructor({profileName, parserCallback}) {

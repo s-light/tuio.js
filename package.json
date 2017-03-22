@@ -1,6 +1,6 @@
 {
   "name": "s-light-tuio.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "small wrapper to convert TUIO WebSocket osc messages to nice Events - all in the browser",
   "main": "src/tuio.js",
   "homepage": "https://github.com/s-light/tuio.js",

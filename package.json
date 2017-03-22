@@ -1,0 +1,24 @@
+{
+  "name": "s-light-tuio.js",
+  "version": "0.2.0",
+  "description": "small wrapper to convert TUIO WebSocket osc messages to nice Events - all in the browser",
+  "main": "src/tuio.js",
+  "homepage": "https://github.com/s-light/tuio.js",
+  "repository": "git@github.com:s-light/tuio.js.git",
+  "bugs": "https://github.com/s-light/tuio.js/issues",
+  "author": "s-light <github@s-light.eu>",
+  "license": "MIT",
+  "keywords": [
+    "TUIO",
+    "WebSocket",
+    "OSC",
+    "Pointer",
+    "Event",
+    "Fiducials",
+    "browser"
+  ],
+  "dependencies": {
+    "osc": "^2.2.0",
+    "wolfy87-eventemitter": "^5.1.0"
+  }
+}

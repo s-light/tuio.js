@@ -8,6 +8,9 @@ can convert tuio-osc messages to events - with Add/Set/Delete handling of the TU
 install this and all dependencies with [bower](https://bower.io/):
 `yourproject$ bower install tuio.js`
 
+install this and all dependencies with [yarn](https://yarnpkg.com/):
+`yourproject$ yarn add s-light-tuio.js`
+
 for usage examples see [tuio.js-examples](https://github.com/s-light/tuio.js-examples)
 
 more documentation to come.  

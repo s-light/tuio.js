@@ -161,7 +161,6 @@ class TUIOReceiver extends EventEmitter {
 
         // register listeners
         this.listen();
-        this.oscPort.open();
 
         // this.oscPort.socket.onmessage = function (e) {
         //     console.log("message", e);
@@ -248,8 +247,6 @@ class TUIOReceiver extends EventEmitter {
 
     handleMessage(oscMessage) {
 
-
-
         // implement statemaschine:
         // states:
         //  source  (optional)
@@ -271,6 +268,16 @@ class TUIOReceiver extends EventEmitter {
         // if the they come in order and are finalized with a fseq message.
         // --> only one input!
 
+        // ATTENTION!!!
+        // DOES THIS REALLY WORK ?!?
+        // can the handleMessage handler get called out of order ?!
+        // --> is it an async call!!???
+        // It is not clear how to test :-(
+        // some more research needed!!
+
+        // debug info
+        // const dbid = Math.random();
+
         const address = oscMessage.address;
         // check for tuio message
         if (address.startsWith("/tuio/")) {
@@ -279,6 +286,7 @@ class TUIOReceiver extends EventEmitter {
             const tuioMessage = oscMessage.args;
 
             // console.log("address", address, "tuioMessage", tuioMessage);
+            // console.log(address, tuioMessage[0], tuioMessage[1]);
             const profile = address.slice(
                 address.indexOf('/tuio/') + '/tuio/'.length
             );
@@ -294,7 +302,7 @@ class TUIOReceiver extends EventEmitter {
                 // get message type
                 const [messageType, ...messageParams] = tuioMessage;
                 // console.log("messageType", messageType, "messageParams", messageParams);
-
+                // console.log( dbid, "type", messageType);
                 switch (messageType) {
                     case 'source': {
                         this.inputBuffer.source = messageParams[0];
@@ -326,6 +334,7 @@ class TUIOReceiver extends EventEmitter {
                 // order of received messages (bundle) not correct!!!
                 // resetting inputBuffer
                 console.log("received message bundle corrupt!!", this.inputBuffer);
+                // console.log( dbid, "received message bundle corrupt!!", this.inputBuffer);
                 // clean inputBuffer
                 this.inputBuffer = this.createInputBuffer();
                 // console.log(
@@ -447,7 +456,10 @@ class TUIOReceiver extends EventEmitter {
 
             // emit all 'Del' events
             for (const sessionID of delSessionIDs) {
+                // get the last possible values
                 const values = tuioProfile.sessionIDs.get(sessionID);
+                // now we can safely delete the entry.
+                tuioProfile.sessionIDs.delete(sessionID);
                 this.emitTuioEvent({
                     source: bundle.source,
                     eventType: 'Del',
@@ -455,8 +467,6 @@ class TUIOReceiver extends EventEmitter {
                     sessionID: sessionID,
                     values: values
                 });
-                // now we can safely delete the entry.
-                tuioProfile.sessionIDs.delete(sessionID);
             }
 
             // console.log(
@@ -492,6 +502,13 @@ class TUIOReceiver extends EventEmitter {
         // https://github.com/Olical/EventEmitter/blob/master/docs/api.md#emit
         this.emit(eventName, eventObject);
         // console.log("eventName", eventName, "eventObject", eventObject);
+    }
+
+    open(){
+        this.oscPort.open();
+    }
+    close(){
+        this.oscPort.close();
     }
 
     // ******************************************

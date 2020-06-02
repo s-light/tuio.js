@@ -308,10 +308,10 @@ once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-osc@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/osc/-/osc-2.4.0.tgz#f5afb8b6868bea73069ec8f5b56f7b59daa608a0"
-  integrity sha512-QNGMS9/gT4Q8nrtbbw43/+OFZKJL35GQ99o/U3J6zU3xGPIMpuv/HRf+I+igMCYxTzZHN8WP5k7wypqWOiAZUw==
+osc@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/osc/-/osc-2.4.1.tgz#b75f13024190e9b77fbad62391aeb22fc9de8e73"
+  integrity sha512-3ZJjyqCoHh3J7K5jvXa+RKHHx6qML9hwqWhVk/YON9344QyjpRYdi+ljP8KMsFNTnVfoP82QNIiOkpL9J7mbzA==
   dependencies:
     long "4.0.0"
     slip "1.0.2"
